@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css" /><link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"><link rel="stylesheet" href="css/L.Control.Locate.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+        <link rel="stylesheet" href="css/leaflet.draw.css" />
+        <link rel="stylesheet" href="css/leaflet.measurecontrol.css" />
+        <script src="js/leaflet.js"></script><script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet-heat.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/OSMBuildings-Leaflet.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/leaflet.draw.js"></script>
+        <script src="js/leaflet.measurecontrol.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <style>
+        html, body, #map {
+            width: 99%;
+            height: 95%;
+            margin-left: 0.5%;
+        }
+        </style>
+        <title>SOFF</title>
+    </head>
+    <header>
+      <h1>Southern Ontario Fly Fishing Locations</h1>
+      <h2>Pools - Parking - Fly shops</h2>
+      <style>
+        header {
+          margin-left: 0.5%;
+          padding-top: 1%;
+          background-color: #293A4C;
+          color: #ECF0F1;
+          font-family: "Ubuntu";
+          text-align: center;
+          width: 99%;
+          height: 20%;
+        }
+      </style>
+    </header>
+    <body>
+        <div id="map">
+        </div>
+        <script src="data/json_sontflyfishinglocations0.js"></script>
+        <script>
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        var map = L.map('map', {
+            measureControl:true,
+            zoomControl:true, maxZoom:18, minZoom:6
+        }).fitBounds([[42.7284679919,-81.7620985406],[44.6974708762,-76.5193562456]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.addAttribution('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a>');
+        L.control.locate().addTo(map);
+        var feature_group = new L.featureGroup([]);
+        var bounds_group = new L.featureGroup([]);
+        var raster_group = new L.LayerGroup([]);
+        var basemap0 = L.tileLayer('http://a.tile.stamen.com/terrain/{z}/{x}/{y}.png', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>,<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash;Map data: &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>contributors,<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 18
+        });
+        basemap0.addTo(map);
+        function setBounds() {
+        }
+        function geoJson2heat(geojson, weight) {
+          return geojson.features.map(function(feature) {
+            return [
+              feature.geometry.coordinates[1],
+              feature.geometry.coordinates[0],
+              feature.properties[weight]
+            ];
+          });
+        }
+        function pop_sontflyfishinglocations0(feature, layer) {
+            var popupContent = '<table><tr><td colspan="2"><strong>Name</strong><br />' + (feature.properties['Name'] !== null ? Autolinker.link(String(feature.properties['Name'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['descriptio'] !== null ? Autolinker.link(String(feature.properties['descriptio'])) : '') + '</td></tr><tr><td colspan="2">' + (feature.properties['type'] !== null ? Autolinker.link(String(feature.properties['type'])) : '') + '</td></tr><tr><td colspan="2"><strong>waterway</strong><br />' + (feature.properties['waterway'] !== null ? Autolinker.link(String(feature.properties['waterway'])) : '') + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStylesontflyfishinglocations0(feature) {
+			switch (feature.properties['type']) {
+                case 'fly shop':
+                    return {
+                    radius: 12.0,
+                    fillColor: '#dd68ca',
+                    color: '',
+                    weight: 0,
+                    opacity: 1,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'parking':
+                    return {
+                    radius: 4.0,
+                    fillColor: '#cfa44f',
+                    color: '#000000',
+                    weight: 0.0,
+                    opacity: 1.0,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+                case 'pool':
+                    return {
+                    radius: 8.0,
+                    fillColor: '#3f51b5',
+                    color: '',
+                    weight: 0,
+                    opacity: 1,
+                    dashArray: '',
+                    fillOpacity: '1.0',
+                };
+                break;
+            }
+        }
+        map.createPane('pane_sontflyfishinglocations0');
+        map.getPane('pane_sontflyfishinglocations0').style.zIndex = 601;
+        var json_sontflyfishinglocations0JSON = new L.geoJson(json_sontflyfishinglocations0, {
+            pane: 'pane_sontflyfishinglocations0',
+            onEachFeature: pop_sontflyfishinglocations0,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, doStylesontflyfishinglocations0(feature))
+            }
+        });
+        bounds_group.addLayer(json_sontflyfishinglocations0JSON);
+        feature_group.addLayer(json_sontflyfishinglocations0JSON);
+        raster_group.addTo(map);
+        feature_group.addTo(map);
+        var baseMaps = {'Stamen Terrain': basemap0};
+        L.control.layers();
+        L.control.layers(baseMaps,{'sont_flyfishing_locations<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/sontflyfishinglocations0_flyshop.png" /> fly shop<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/sontflyfishinglocations0_parking.png" /> parking<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="legend/sontflyfishinglocations0_pool.png" /> pool<br />': json_sontflyfishinglocations0JSON,},{collapsed:false}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+    <footer>
+    <style>
+      footer {
+        margin-left: 0.5%;
+        padding-top: 1%;
+        background-color: #39A652;
+        color: #ECF0F1;
+        font-family: "Ubuntu";
+        text-align: center;
+        width: 99%;
+        height: 15%;
+      }
+    </style>
+    </footer>
+</html>
